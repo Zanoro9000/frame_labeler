@@ -55,6 +55,12 @@ export const appSlice = createSlice({
     addBox: (state, action: PayloadAction<Box>) => {
       state.boxes[state.frame].push(action.payload)
     },    
+    removeBox: (state, action: PayloadAction<number>) => {
+      const boxes = state.boxes[state.frame]
+      if (!!boxes && boxes.length > action.payload) {
+        state.boxes[state.frame].splice(action.payload, 1)
+      }
+    }, 
   },
   extraReducers: (builder) => {
     builder.addCase(fetchImageMeta.fulfilled, (state, action) => {
@@ -82,6 +88,7 @@ export const {
   incrementFrame,
   decrementFrame,
   addBox,
+  removeBox,
 } = appSlice.actions;
 
 export const useAppSelector = <T>(s: (a: AppState) => T) =>

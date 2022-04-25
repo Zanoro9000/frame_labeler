@@ -103,7 +103,7 @@ export function useCanvas(
         }
       }
     }
-  }, [ref, color, drawFn, lineWidth, onDragRegion, onEndRegion, onStartRegion])
+  }, [ref, color, fillColor, drawFn, lineWidth, onDragRegion, onEndRegion, onStartRegion])
 
   return ref;
 
