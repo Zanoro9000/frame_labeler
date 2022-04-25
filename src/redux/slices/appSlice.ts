@@ -64,7 +64,7 @@ export const appSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(fetchImageMeta.fulfilled, (state, action) => {
-      state.totalFrames = action.payload.frame_count 
+      state.totalFrames = action.payload.frame_count - 1;
       state.loading = false;
     })
     builder.addCase(fetchImageMeta.rejected, (state, action) => {
