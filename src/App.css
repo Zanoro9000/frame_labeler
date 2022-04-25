@@ -49,3 +49,15 @@ html, body {
   width: 100%;
   top: calc(100% + 8px);
 }
+
+.boxDelete {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 100%;
+  padding: 4px;
+}
+
+.boxDelete:hover {
+  background-color: rgba(0, 0, 0, .1);
+}
