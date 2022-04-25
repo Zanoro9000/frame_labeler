@@ -8,13 +8,23 @@ export type useCanvasOptions = {
   onDragRegion?: (e: MouseEvent) => void,
   regionOpts?: {
     color?: string;
+    fillColor?: string;
     lineWidth?: number;
   },
 }
 
 export function useCanvas(
   drawFn: (context: CanvasRenderingContext2D, frameCount?: number) => Promise<void>, 
-  { onStartRegion, onEndRegion, onDragRegion, regionOpts: { color = 'red', lineWidth = 2 } = {} }: useCanvasOptions
+  { 
+    onStartRegion, 
+    onEndRegion, 
+    onDragRegion, 
+    regionOpts: { 
+      color = 'red', 
+      fillColor = 'rgba(255, 0, 0, .2)',
+      lineWidth = 2 
+    } = {} 
+  }: useCanvasOptions
 ){
   const ref = useRef<HTMLCanvasElement>(null);
 
@@ -34,8 +44,15 @@ export function useCanvas(
         let anchor: { x: number, y: number } | undefined;
 
         const mouseDown = (e: MouseEvent) => { 
-          anchor = { x: e.clientX - x0, y: e.clientY - y0 } 
-          onStartRegion?.(e)
+          if (
+            e.clientX >= x0 && 
+            e.clientX <= x0 + canvas.width && 
+            e.clientY >= y0 && 
+            e.clientY <= y0 + canvas.height
+          ) {
+            anchor = { x: e.clientX - x0, y: e.clientY - y0 } 
+            onStartRegion?.(e)
+          }          
         }
 
         const mouseMove = (e: MouseEvent) => { 
@@ -49,6 +66,11 @@ export function useCanvas(
                 context.beginPath();
                 context.rect(x, y, e.clientX - x0 - x, e.clientY - y0 - y)
                 context.stroke();
+
+                context.fillStyle = fillColor;
+                context.beginPath();
+                context.fillRect(x, y, e.clientX - x0 - x, e.clientY - y0 - y)
+                context.stroke();
               })           
 
             onDragRegion?.(e)
@@ -59,6 +81,7 @@ export function useCanvas(
           if (anchor) {
             const { x, y } = anchor;
             onEndRegion?.(e, { x, y, w: e.clientX - x0 - x, h: e.clientY - y0 - y })
+            anchor = undefined
           }
         }
 

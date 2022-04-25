@@ -8,6 +8,7 @@ html, body {
   width: 50vw;
   height: 50vh;
   margin: auto;
+  padding: 16px;
 }
 
 .header {
@@ -21,4 +22,30 @@ html, body {
 
 .frameCanvas {
   padding: 16px;
+}
+
+.boxManager {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid darkgray;
+  margin: auto;
+  padding: 16px 32px;
+}
+
+.boxRow {
+  margin: auto;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin: 16px auto;
+}
+
+.boxRow:not(:last-child)::after {
+  border-bottom: 1px solid grey;
+  content: "";
+  position: absolute;
+  width: 100%;
+  top: calc(100% + 8px);
 }
