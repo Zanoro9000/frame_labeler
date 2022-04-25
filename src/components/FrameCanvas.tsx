@@ -21,10 +21,13 @@ export function FrameCanvas() {
 
         context.lineWidth = 2;
         context.strokeStyle = 'black';
-        boxes.forEach(b => {
+        context.font = '20px Arial'
+        context.fillStyle = 'red'
+        boxes.forEach((b, i) => {
           context.beginPath();
           context.rect(b.x, b.y, b.w, b.h)
           context.stroke();
+          context.fillText(i.toString(), Math.min(b.x, b.x + b.w) + 5, Math.min(b.y, b.y + b.h) + 20, Math.abs(b.w) - 5)
         })  
         res();
       }
