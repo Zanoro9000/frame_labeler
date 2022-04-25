@@ -1,23 +1,32 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { useSelector } from 'react-redux';
+import { fetchImage, fetchImageMeta } from '../actionCreators.ts/appActions';
 import type { RootState } from '../store';
 
 export type Box = {
-  x1: number
-  x2: number
-  y1: number
-  y2: number
+  x: number
+  y: number
+  w: number
+  h: number
 }
 
 export type AppState = {
   frame: number,
-  boundingBoxes: Record<number, Box[]>
+  loading: boolean,
+  error?: string,
+  totalFrames: number,
+  boxes: Record<number, Box[]>,
+  images: Record<number, string>,
 }
 
 // Define the initial state using that type
 const initialState: AppState = {
   frame: 0,
-  boundingBoxes: {}
+  loading: true,
+  error: undefined,
+  totalFrames: 0,
+  boxes: { 0: [] },
+  images: {}
 };
 
 export const appSlice = createSlice({
@@ -25,18 +34,54 @@ export const appSlice = createSlice({
   initialState,
   reducers: {
     reset: () => initialState,    
-    loadFrame: (state, action: PayloadAction<number>) => {
-      state.frame = action.payload;
-      if (!state.boundingBoxes[state.frame]) state.boundingBoxes[state.frame] = []
+    setFrame: (state, action: PayloadAction<number>) => {
+      state.frame = Math.max(0 , Math.min(action.payload, state.totalFrames));
+      if (!state.boxes[state.frame]) state.boxes[state.frame] = [];
+      state.loading = true;
+      state.error = undefined;
+    }, 
+    incrementFrame: (state) => {
+      state.frame = Math.min(state.frame + 1, state.totalFrames);
+      if (!state.boxes[state.frame]) state.boxes[state.frame] = [];
+      state.loading = true;
+      state.error = undefined;
+    }, 
+    decrementFrame: (state) => {
+      state.frame = Math.max(state.frame - 1, 0);
+      if (!state.boxes[state.frame]) state.boxes[state.frame] = []
+      state.loading = true;
+      state.error = undefined;
     }, 
     addBox: (state, action: PayloadAction<Box>) => {
-      state.boundingBoxes[state.frame].push(action.payload)
+      state.boxes[state.frame].push(action.payload)
     },    
   },
+  extraReducers: (builder) => {
+    builder.addCase(fetchImageMeta.fulfilled, (state, action) => {
+      state.totalFrames = action.payload.frame_count 
+      state.loading = false;
+    })
+    builder.addCase(fetchImageMeta.rejected, (state, action) => {
+      state.error = 'Unable to load meta';
+      state.loading = false;
+    })
+    builder.addCase(fetchImage.fulfilled, (state, action) => {
+      state.images[state.frame] = action.payload;
+      state.loading = false;
+    })
+    builder.addCase(fetchImage.rejected, (state, action) => {
+      state.error = 'Unable to load image';
+      state.loading = false;
+    })
+  }
 });
 
 export const {
-  reset
+  reset,
+  setFrame,
+  incrementFrame,
+  decrementFrame,
+  addBox,
 } = appSlice.actions;
 
 export const useAppSelector = <T>(s: (a: AppState) => T) =>
